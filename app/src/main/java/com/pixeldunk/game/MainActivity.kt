@@ -90,6 +90,50 @@ class MainActivity : Activity() {
             p.textSize = size; p.color = color; c.drawText(s, x, y, p)
         }
 
+        private fun drawNarrator(c: Canvas) {
+            // Adult narrator portrait: fashionable, warm, expressive pixel-art styling.
+            val bob = if (frame % 48 < 24) 0f else 1f
+            val hair = Color.rgb(74, 39, 57)
+            val skin = Color.rgb(246, 190, 158)
+            val outfit = Color.rgb(190, 91, 137)
+            // Portrait frame and soft accent.
+            rect(c, 244f, 82f, 66f, 91f, Color.rgb(49, 35, 58))
+            rect(c, 247f, 85f, 60f, 85f, Color.rgb(238, 184, 190))
+            // Hair silhouette and side locks.
+            rect(c, 254f, 91f+bob, 47f, 48f, hair)
+            rect(c, 250f, 105f+bob, 9f, 43f, hair)
+            rect(c, 296f, 108f+bob, 8f, 43f, hair)
+            // Face, fringe, eyes and animated mouth.
+            rect(c, 260f, 101f+bob, 34f, 39f, skin)
+            rect(c, 258f, 96f+bob, 38f, 12f, hair)
+            rect(c, 263f, 116f+bob, 5f, 3f, Color.rgb(54, 37, 49))
+            rect(c, 284f, 116f+bob, 5f, 3f, Color.rgb(54, 37, 49))
+            rect(c, 272f, 128f+bob, 9f, if (frame % 36 < 5) 2f else 4f, Color.rgb(166, 72, 100))
+            rect(c, 258f, 126f+bob, 5f, 3f, Color.rgb(235, 132, 143))
+            rect(c, 290f, 126f+bob, 5f, 3f, Color.rgb(235, 132, 143))
+            // Stylish collar and outfit.
+            rect(c, 258f, 141f+bob, 38f, 6f, Color.rgb(255, 224, 207))
+            rect(c, 253f, 147f+bob, 48f, 22f, outfit)
+            rect(c, 272f, 147f+bob, 8f, 15f, Color.rgb(255, 224, 207))
+            rect(c, 250f, 164f+bob, 54f, 6f, Color.rgb(125, 57, 99))
+            // Dialogue card.
+            rect(c, 12f, 448f, 296f, 92f, Color.rgb(48, 37, 57))
+            rect(c, 15f, 451f, 290f, 86f, Color.rgb(245, 221, 214))
+            rect(c, 15f, 451f, 290f, 5f, Color.rgb(213, 128, 158))
+            val line = when {
+                secret -> "Oh... something is here."
+                score > 0 && score % 3 == 0 -> "That's my champion! So lovely!"
+                score > 0 -> "Look at you go, sweetheart!"
+                misses >= 3 -> "Aww, breathe. Try once more!"
+                misses > 0 -> "Ooh, close one, honey!"
+                dragging -> "Easy does it... you've got this!"
+                else -> "Ready, sweetheart? Show me!"
+            }
+            text(c, "MOMMY", 25f, 473f, 10f, Color.rgb(151, 67, 111))
+            text(c, line, 25f, 496f, 10f, Color.rgb(54, 42, 57))
+            text(c, "♡", 279f, 473f, 12f, Color.rgb(213, 102, 143))
+        }
+
         private fun drawScene(c: Canvas) {
             rect(c,0f,0f,320f,568f,Color.rgb(18,22,35))
             // Pixel-art gym backdrop.
@@ -118,6 +162,7 @@ class MainActivity : Activity() {
                 }
                 text(c,"PULL BACK  /  RELEASE",74f,520f,9f,Color.WHITE)
             } else if (!launched) text(c,"DRAG BACK TO AIM",92f,520f,10f,Color.LTGRAY)
+            drawNarrator(c)
             // Ball with crisp pixel highlights.
             rect(c,ballX-9f,ballY-9f,18f,18f,Color.rgb(221,112,43))
             rect(c,ballX-6f,ballY-9f,3f,18f,Color.rgb(90,48,35))
