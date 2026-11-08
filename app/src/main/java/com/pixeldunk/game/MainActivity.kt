@@ -28,7 +28,7 @@ class MainActivity : Activity() {
         private var score = 0; private var misses = 0; private var level = 1
         private var rimX = 250f; private val rimY = 250f
         private var scored = false; private var flash = 0f
-        private var secret = false; private var secretTimer = 0f
+        private var secret = false; private var secretTimer = 0f; private var secretPhase = 0; private var secretSeen = false
         private var lastTime = System.nanoTime()
         private var frame = 0
 
@@ -49,7 +49,13 @@ class MainActivity : Activity() {
             frame++
             if (secret) {
                 secretTimer -= dt
-                if (secretTimer <= 0f) { secret = false; resetBall() }
+                if (secretTimer <= 0f) {
+                    when (secretPhase) {
+                        1 -> { secretPhase = 2; secretTimer = .22f }
+                        2 -> { secretPhase = 3; secretTimer = .52f }
+                        else -> { secret = false; secretSeen = true; secretPhase = 0; resetBall() }
+                    }
+                }
                 return
             }
             if (!launched) return
@@ -59,9 +65,9 @@ class MainActivity : Activity() {
             if (ballX < 12f || ballX > 308f) { vx *= -.72f; ballX = ballX.coerceIn(12f,308f) }
             if (ballY > 500f) {
                 misses++
-                // Hidden easter egg: a rare-looking, skill-dependent sequence; never advertised in UI.
-                if (level >= 3 && misses >= 4 && ballX > 220f && frame % 7 == 0) {
-                    secret = true; secretTimer = 1.15f
+                // One-time hidden scare: no menu hint, and only after sustained play.
+                if (!secretSeen && level >= 3 && misses >= 4 && ballX > 220f) {
+                    secret = true; secretPhase = 1; secretTimer = .58f
                 } else resetBall()
             }
             if (!scored && oldY < rimY && ballY >= rimY && ballX in (rimX - 13f)..(rimX + 22f) && vy > 0f) {
@@ -118,13 +124,28 @@ class MainActivity : Activity() {
             rect(c,ballX-9f,ballY-2f,18f,3f,Color.rgb(90,48,35))
             rect(c,ballX-5f,ballY-6f,3f,3f,Color.rgb(255,190,105))
             if (secret) {
-                rect(c,0f,0f,320f,568f,Color.BLACK)
-                // Brief, stylized pixel phantom; no gore or realistic imagery.
-                rect(c,74f,150f,172f,220f,Color.rgb(12,12,18))
-                rect(c,101f,200f,118f,110f,Color.rgb(226,226,218))
-                rect(c,116f,224f,23f,27f,Color.BLACK); rect(c,180f,224f,23f,27f,Color.BLACK)
-                rect(c,145f,275f,31f,12f,Color.rgb(120,24,34))
-                text(c,"...",150f,408f,18f,Color.WHITE)
+                if (secretPhase == 1) {
+                    // Almost-missed warning: the gym sinks into darkness, with two tiny distant pixels.
+                    rect(c,0f,0f,320f,568f,Color.argb(218,3,5,10))
+                    rect(c,151f,176f,3f,3f,Color.rgb(92,105,112))
+                    rect(c,166f,176f,3f,3f,Color.rgb(92,105,112))
+                } else if (secretPhase == 2) {
+                    // Sudden close-up, deliberately abstract and non-graphic.
+                    rect(c,0f,0f,320f,568f,Color.BLACK)
+                    rect(c,28f,92f,264f,350f,Color.rgb(10,10,16))
+                    rect(c,48f,126f,224f,250f,Color.rgb(205,207,198))
+                    rect(c,74f,192f,58f,66f,Color.BLACK)
+                    rect(c,188f,192f,58f,66f,Color.BLACK)
+                    rect(c,91f,210f,20f,22f,Color.rgb(235,235,220))
+                    rect(c,209f,210f,20f,22f,Color.rgb(235,235,220))
+                    rect(c,116f,302f,88f,26f,Color.rgb(38,12,20))
+                    rect(c,128f,302f,12f,10f,Color.WHITE)
+                    rect(c,152f,302f,12f,10f,Color.WHITE)
+                } else {
+                    // Brief black beat before control returns to the court.
+                    rect(c,0f,0f,320f,568f,Color.BLACK)
+                    rect(c,157f,276f,6f,6f,Color.rgb(110,22,32))
+                }
             }
         }
 
